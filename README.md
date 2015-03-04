@@ -1,4 +1,4 @@
-Cosmos [![Build Status](https://travis-ci.org/skidding/cosmos.svg)](https://travis-ci.org/skidding/cosmos)
+Cosmos [![Build Status](https://travis-ci.org/skidding/cosmos.svg?branch=master)](https://travis-ci.org/skidding/cosmos)
 ===
 A foundation for maintainable web applications.
 
@@ -41,9 +41,9 @@ or include the build directly in your project.
 
 ```html
 <!-- Development build -->
-<script src="http://skidding.github.io/cosmos/build/cosmos.js"></script>
+<script src="http://skidding.github.io/cosmos/release/cosmos-0.4.0.js"></script>
 <!-- Production build -->
-<script src="http://skidding.github.io/cosmos/build/cosmos.min.js"></script>
+<script src="http://skidding.github.io/cosmos/release/cosmos-0.4.0.min.js"></script>
 ```
 
 ## Specs
@@ -110,7 +110,7 @@ information on the built-in mixins in Cosmos.
 ### Core concepts
 
 Reserved props when working with Cosmos: `component`, `componentLookup` and
-`state`.
+`state`. The `children` state key is also _magical,_ so it shouldn't be used.
 
 #### Component lookup
 
@@ -138,7 +138,7 @@ Then, we attach components to that namespace.
 
 ```js
 components.Boy = React.createClass({
-  mixins: [Cosmos.mixins.PersistState],
+  mixins: [Cosmos.mixins.ComponentTree],
 
   getInitialState: function() {
     return {
@@ -177,7 +177,7 @@ The props and state of a component can be joined into a unified snapshot. The
 // Why do people sleep at night?
 boy.setState({mood: 'curious'});
 
-var boySnapshot = boy.generateSnapshot();
+var boySnapshot = boy.serialize();
 ```
 
 This is what `boySnapshot` will look like:
@@ -212,11 +212,11 @@ Cosmos gets interesting when dealing with nested components. The entire state
 of a component tree can be serialized recursively, as well as injected top-down
 from the root component to the tree leaves.
 
-This is achieved through the `loadChild` API of the `PersistState` mixin.
+This is achieved through the `loadChild` API of the `ComponentTree` mixin.
 
 ```js
 components.Father = React.createClass({
-  mixins: [Cosmos.mixins.PersistState],
+  mixins: [Cosmos.mixins.ComponentTree],
 
   children: {
     son: function() {
@@ -264,7 +264,7 @@ We can now generate a recursive snapshot and take a capture of the nested
 state.
 
 ```js
-var familySnapshot = father.generateSnapshot(true);
+var familySnapshot = father.serialize(true);
 ```
 
 This is what the nested snapshot will look like:
@@ -363,11 +363,14 @@ changes. That object will always be a visible, persistent data structure.
 
 ## Contributing
 
-Until the Cosmos project becomes more solid and concrete, I urge you to recall
-a past experience of building a web application that became harder and harder
-to work on as time passed and development progressed. Attempt to answer this
-question: If you enforced the Cosmos principles onto the infrastructure you're
-picturing, would it: a) improve, b) complicate or c) not influence the
-situation?
+Cosmos has been built alongside a bigger UI project for over six months, but
+is still is the process of being defined. A few things from the current roadmap:
+
+- ~~Remove AnimationLoop mixin from project~~ [#99](https://github.com/skidding/cosmos/pull/99)
+- ~~Remove DataFetch mixin from project~~ [#100](https://github.com/skidding/cosmos/pull/100)
+- ~~Remove jQuery dependency (only DataFetch mixin uses it for XHR calls)~~ [#100](https://github.com/skidding/cosmos/pull/100)
+- Add props editor to ComponentPlayground
+- Enhance Router with customizable routes
+- Migrate tests from jsdom to either PhantomJS or plain Node
 
 Thank you for your interest!

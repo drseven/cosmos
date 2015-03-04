@@ -18,6 +18,8 @@ describe("Cosmos.Router", function() {
     global.window = jsdom.jsdom().createWindow('<html><body></body></html>');
     global.document = global.window.document;
     global.navigator = global.window.navigator;
+    // We're mocking the URL of the window
+    global.window.location = {href: 'mocked-location-href'};
 
     React = require('react/addons');
     utils = React.addons.TestUtils;
@@ -77,6 +79,13 @@ describe("Cosmos.Router", function() {
       expect(propsSent.router).toEqual(router);
     });
 
+    it("should set key to current window location href", function() {
+      var router = new Cosmos.Router();
+
+      var propsSent = Cosmos.render.calls.mostRecent().args[0];
+      expect(propsSent.key).toEqual('mocked-location-href');
+    });
+
     it("should default to document.body as container", function() {
       var router = new Cosmos.Router();
 
@@ -109,7 +118,7 @@ describe("Cosmos.Router", function() {
 
     it("should use props param", function() {
       var router = new Cosmos.Router();
-      router.goTo('?component=List&dataUrl=users.json');
+      router.goTo('my-page?component=List&dataUrl=users.json');
 
       var propsSent = Cosmos.render.calls.mostRecent().args[0];
       expect(propsSent.component).toEqual('List');
@@ -121,7 +130,7 @@ describe("Cosmos.Router", function() {
         component: 'DefaultComponent',
         defaultProp: true
       });
-      router.goTo('?component=List&dataUrl=users.json');
+      router.goTo('my-page?component=List&dataUrl=users.json');
 
       var propsSent = Cosmos.render.calls.mostRecent().args[0];
       expect(propsSent.component).toEqual('List');
@@ -131,15 +140,23 @@ describe("Cosmos.Router", function() {
 
     it("should attach router reference to props", function() {
       var router = new Cosmos.Router();
-      router.goTo('?component=List&dataUrl=users.json');
+      router.goTo('my-page?component=List&dataUrl=users.json');
 
       var propsSent = Cosmos.render.calls.mostRecent().args[0];
       expect(propsSent.router).toEqual(router);
     });
 
+    it("should set key to sent href value", function() {
+      var router = new Cosmos.Router();
+      router.goTo('my-page?component=List&dataUrl=users.json');
+
+      var propsSent = Cosmos.render.calls.mostRecent().args[0];
+      expect(propsSent.key).toEqual('my-page?component=List&dataUrl=users.json');
+    });
+
     it("should push component snapshot to browser history", function() {
       ComponentClass = React.createClass({
-        mixins: [Cosmos.mixins.PersistState],
+        mixins: [Cosmos.mixins.ComponentTree],
         render: function() {
           return React.DOM.span();
         }
@@ -148,7 +165,7 @@ describe("Cosmos.Router", function() {
       componentInstance = utils.renderIntoDocument(componentElement);
 
       // Simulate some state addition in the component
-      spyOn(componentInstance, 'generateSnapshot').and.callFake(function() {
+      spyOn(componentInstance, 'serialize').and.callFake(function() {
         return {
           component: 'List',
           dataUrl: 'users.json',
@@ -159,13 +176,14 @@ describe("Cosmos.Router", function() {
       });
 
       var router = new Cosmos.Router();
-      router.goTo('?component=List&dataUrl=users.json');
+      router.goTo('my-page?component=List&dataUrl=users.json');
 
       // Simulate React.render callback call
       componentCallback.call(componentInstance);
 
-      // The snapshot should've been extracted from the component
-      expect(componentInstance.generateSnapshot).toHaveBeenCalled();
+      // The recursive snapshot should've been extracted from the component
+      expect(componentInstance.serialize.calls.mostRecent().args[0])
+             .toBe(true);
 
       // It's a bit difficult to mock the native functions so we mocked the
       // private methods that wrap those calls
@@ -180,7 +198,7 @@ describe("Cosmos.Router", function() {
 
     it("shouldn't push default props to browser history", function() {
       ComponentClass = React.createClass({
-        mixins: [Cosmos.mixins.PersistState],
+        mixins: [Cosmos.mixins.ComponentTree],
         render: function() {
           return React.DOM.span();
         }
@@ -192,7 +210,7 @@ describe("Cosmos.Router", function() {
         // This won't be called because Cosmos.render is mocked
       };
 
-      spyOn(componentInstance, 'generateSnapshot').and.callFake(function() {
+      spyOn(componentInstance, 'serialize').and.callFake(function() {
         return {
           component: 'List',
           componentLookup: componentLookup,
@@ -206,7 +224,7 @@ describe("Cosmos.Router", function() {
         componentLookup: componentLookup,
         defaultProp: true
       });
-      router.goTo('?component=List&dataUrl=users.json');
+      router.goTo('my-page?component=List&dataUrl=users.json');
 
       // Simulate React.render callback call
       componentCallback.call(componentInstance);
@@ -223,7 +241,7 @@ describe("Cosmos.Router", function() {
 
     it("shouldn't push router instance to browser history", function() {
       ComponentClass = React.createClass({
-        mixins: [Cosmos.mixins.PersistState],
+        mixins: [Cosmos.mixins.ComponentTree],
         render: function() {
           return React.DOM.span();
         }
@@ -233,7 +251,7 @@ describe("Cosmos.Router", function() {
 
       var router = new Cosmos.Router();
 
-      spyOn(componentInstance, 'generateSnapshot').and.callFake(function() {
+      spyOn(componentInstance, 'serialize').and.callFake(function() {
         return {
           component: 'List',
           dataUrl: 'users.json',
@@ -241,7 +259,7 @@ describe("Cosmos.Router", function() {
         };
       });
 
-      router.goTo('?component=List&dataUrl=users.json');
+      router.goTo('my-page?component=List&dataUrl=users.json');
 
       // Simulate React.render callback call
       componentCallback.call(componentInstance);
@@ -256,7 +274,7 @@ describe("Cosmos.Router", function() {
       /* Note: This is not a pure unit test, it depends on the internal logic
       of React components */
       ComponentClass = React.createClass({
-        mixins: [Cosmos.mixins.PersistState],
+        mixins: [Cosmos.mixins.ComponentTree],
         render: function() {
           return React.DOM.span();
         }
@@ -275,7 +293,7 @@ describe("Cosmos.Router", function() {
 
       // Before routing to a new Component configuration, the previous one
       // shouldn't been updated with our changes
-      router.goTo('?component=User&dataUrl=user.json');
+      router.goTo('my-page?component=User&dataUrl=user.json');
 
       // It's a bit difficult to mock the native functions so we mocked the
       // private methods that wrap those calls
@@ -294,7 +312,7 @@ describe("Cosmos.Router", function() {
       var router = new Cosmos.Router({}, {
         onChange: onChangeSpy
       });
-      router.goTo('?component=MyComponent&myProp=true');
+      router.goTo('my-page?component=MyComponent&myProp=true');
 
       var propsSent = onChangeSpy.calls.mostRecent().args[0];
       expect(propsSent.component).toEqual('MyComponent');
@@ -347,6 +365,16 @@ describe("Cosmos.Router", function() {
 
       var propsSent = Cosmos.render.calls.mostRecent().args[0];
       expect(propsSent.router).toEqual(router);
+    });
+
+    it("should set key to current window location href", function() {
+      var router = new Cosmos.Router();
+      router.onPopState({
+        state: {}
+      });
+
+      var propsSent = Cosmos.render.calls.mostRecent().args[0];
+      expect(propsSent.key).toEqual('mocked-location-href');
     });
 
     it("should call onChange callback", function() {

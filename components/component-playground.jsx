@@ -6,7 +6,7 @@ Cosmos.components.ComponentPlayground = React.createClass({
    * components in isolation. It can either render the component full-screen or
    * with the navigation pane on the side.
    */
-  mixins: [Cosmos.mixins.PersistState,
+  mixins: [Cosmos.mixins.ComponentTree,
            Cosmos.mixins.Url],
 
   displayName: 'ComponentPlayground',
@@ -34,16 +34,19 @@ Cosmos.components.ComponentPlayground = React.createClass({
 
   children: {
     preview: function() {
+      var fixturePath = this.props.fixturePath;
+
       var props = {
-        component: this._getComponentNameFromPath(this.props.fixturePath)
+        component: this._getComponentNameFromPath(fixturePath),
+        key: fixturePath
       };
 
       if (this.props.router) {
         props.router = this.props.router;
       }
 
-      var fixture = this._getFixtureContentsFromPath(this.props.fixturePath);
-      return _.extend(props, fixture);
+      var fixture = this._getFixtureContentsFromPath(fixturePath);
+      return _.merge(props, fixture);
     }
   },
 
@@ -58,9 +61,15 @@ Cosmos.components.ComponentPlayground = React.createClass({
         <div className="header">
           {this.renderFullScreenButton()}
           <h1>
-            <a href="?" onClick={this.routeLink}>
+            <a href="?"
+               className="home-link"
+               onClick={this.routeLink}>
               <span className="react">React</span> Component Playground
             </a>
+            <span className="cosmos-plug">
+              {"powered by "}
+              <a href="https://github.com/skidding/cosmos">Cosmos</a>
+            </span>
           </h1>
         </div>
         <div className="fixtures">

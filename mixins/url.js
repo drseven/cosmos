@@ -7,8 +7,8 @@ Cosmos.mixins.Url = {
     /**
      * Serializes a props object into a browser-complient URL. The URL
      * generated can be simply put inside the href attribute of an <a> tag, and
-     * can be combined with the generateSnapshot method of the PersistState
-     * Mixin to create a link that opens the current Component at root level
+     * can be combined with the serialize method of the ComponentTree Mixin to
+     * create a link that opens the current Component at root level
      * (full window.)
      */
     return '?' + Cosmos.serialize.getQueryStringFromProps(props);
@@ -22,6 +22,6 @@ Cosmos.mixins.Url = {
      * instead of reloading pages.
      */
     event.preventDefault();
-    this.props.router.goTo(event.currentTarget.getAttribute('href'));
+    this.props.router.goTo(event.currentTarget.href);
   }
 };

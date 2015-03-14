@@ -1,5 +1,5 @@
-Cosmos [![Build Status](https://travis-ci.org/skidding/cosmos.svg?branch=master)](https://travis-ci.org/skidding/cosmos)
-===
+# Cosmos [![Build Status](https://travis-ci.org/skidding/cosmos.svg?branch=master)](https://travis-ci.org/skidding/cosmos) [![Coverage Status](https://coveralls.io/repos/skidding/cosmos/badge.svg?branch=master)](https://coveralls.io/r/skidding/cosmos?branch=master)
+
 A foundation for maintainable web applications.
 
 Cosmos glues [React](http://facebook.github.io/react/) components together and
@@ -13,11 +13,14 @@ a route is just an alias to component _props._
 Check out [**Flatris**](http://skidding.github.io/flatris/), a demo app built
 with Cosmos.
 
+[![Join the chat at https://gitter.im/skidding/cosmos](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/skidding/cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Jump to:
 
 - [Manifesto](#manifesto)
 - [Installation](#installation)
 - [Specs](#specs)
+- [Development](#development)
 - [Problem](#problem)
 - [Contributing](#contributing)
 
@@ -41,9 +44,9 @@ or include the build directly in your project.
 
 ```html
 <!-- Development build -->
-<script src="http://skidding.github.io/cosmos/release/cosmos-0.4.0.js"></script>
+<script src="http://skidding.github.io/cosmos/release/cosmos-0.5.0.js"></script>
 <!-- Production build -->
-<script src="http://skidding.github.io/cosmos/release/cosmos-0.4.0.min.js"></script>
+<script src="http://skidding.github.io/cosmos/release/cosmos-0.5.0.min.js"></script>
 ```
 
 ## Specs
@@ -302,6 +305,31 @@ it surfaces any implicit dependencies. It also forces us to define sane inputs
 for every component, no matter how small, making them more predictable and
 easier to debug down the road.
 
+## Development
+
+```bash
+# Run tests once
+npm test
+
+# Run tests continuously
+node_modules/.bin/karma start --reporters progress
+
+# Send code coverage report to coveralls.io
+npm run coveralls
+
+# Lint code
+npm run lint
+
+# Create browser bundle in build/cosmos.js
+npm run build-dev
+
+# Create minified browser bundle in build/cosmos.min.js
+npm run build-prod
+
+# Create CommonJS bundle in build/cosmos.commonjs.js
+npm run build-commonjs
+```
+
 ## Problem
 
 Most web frameworks start out clean and friendly, but at some point after you
@@ -369,8 +397,8 @@ is still is the process of being defined. A few things from the current roadmap:
 - ~~Remove AnimationLoop mixin from project~~ [#99](https://github.com/skidding/cosmos/pull/99)
 - ~~Remove DataFetch mixin from project~~ [#100](https://github.com/skidding/cosmos/pull/100)
 - ~~Remove jQuery dependency (only DataFetch mixin uses it for XHR calls)~~ [#100](https://github.com/skidding/cosmos/pull/100)
+- ~~Migrate tests from jsdom to either PhantomJS or plain Node~~ [#101](https://github.com/skidding/cosmos/pull/101)
 - Add props editor to ComponentPlayground
 - Enhance Router with customizable routes
-- Migrate tests from jsdom to either PhantomJS or plain Node
 
 Thank you for your interest!

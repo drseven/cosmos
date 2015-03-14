@@ -1,6 +1,6 @@
 {
   "name": "cosmos-js",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A foundation for maintainable web applications",
   "repository": {
     "type": "git",
@@ -11,19 +11,39 @@
     "react": "~0.12.2"
   },
   "devDependencies": {
-    "gulp": "~3.8.10",
-    "gulp-concat": "~2.4.3",
-    "gulp-rename": "~1.2.0",
-    "gulp-uglify": "~1.1.0",
-    "gulp-if": "~1.2.5",
-    "gulp-react": "~2.0.0",
-    "gulp-less": "~2.0.1",
-    "jsdom": "~0.11.1",
+    "chai": "^1.10.0",
+    "coveralls": "^2.11.2",
+    "css-loader": "^0.9.1",
+    "esprima-fb": "^12001.1.0-dev-harmony-fb",
+    "istanbul": "^0.3.7",
+    "istanbul-instrumenter-loader": "^0.1.2",
     "jquery": "~1.11.1",
-    "jasmine-node": "~2.0.0"
+    "jscs": "^1.11.3",
+    "jsx-loader": "^0.12.2",
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-cli": "0.0.4",
+    "karma-coverage": "^0.2.7",
+    "karma-mocha": "^0.1.10",
+    "karma-mocha-reporter": "^1.0.0",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sinon-chai": "^0.3.0",
+    "karma-webpack": "^1.5.0",
+    "less": "^2.4.0",
+    "less-loader": "^2.0.0",
+    "mocha": "^2.1.0",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0",
+    "style-loader": "^0.8.3",
+    "webpack": "^1.5.3"
   },
-  "main": "build/cosmos.js",
+  "main": "build/cosmos.commonjs.js",
   "scripts": {
-    "test": "gulp build && jasmine-node --verbose specs"
+    "test": "karma start --single-run",
+    "coveralls": "cat tests/coverage/*/lcov.info | node_modules/coveralls/bin/coveralls.js",
+    "lint": "jscs --esprima=esprima-fb ./",
+    "build-commonjs": "webpack -p --config webpack/commonjs.config.js",
+    "build-dev": "webpack --config webpack/browser.config.js --watch",
+    "build-prod": "webpack -p --config webpack/browser.config.js --output-file build/cosmos.min.js"
   }
 }
